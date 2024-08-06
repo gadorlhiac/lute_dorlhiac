@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -1579,7 +1579,7 @@
 </table>
 <p><strong>NOTE</strong>: The <code>env</code> column currently only stores variables related to <code>SLURM</code> or <code>LUTE</code> itself.</p>
 <h3 id="task-tables"><code>Task</code> tables</h3>
-<p>For every <code>Task</code> a table of the following format will be created. The exact number of columns will depend on the specific <code>Task</code>, as the number of parameters can vary between them, and each parameter gets its own column. Within a table, multiple experiments and runs can coexist. The experiment and run are not recorded directly. Instead the first two columns point to the id of entries in the general configuration and <code>Executor</code> tables respectively. The general configuration table entry will contain the experiment and run information.</p>
+<p>For every <code>Task</code> a table of the following format will be created. The exact number of columns will depend on the specific <code>Task</code>, as the number of parameters can vary between them, and each parameter gets its own column. Within a table, multiple experiments and runs can coexist. The experiment and run are not recorded directly. Instead, the first two columns point to the id of entries in the general configuration and <code>Executor</code> tables respectively. The general configuration table entry will contain the experiment and run information.</p>
 <table>
 <thead>
 <tr>
@@ -1646,6 +1646,18 @@
 </tr>
 </tbody>
 </table>
+<p>Parameter sets which can be described as nested dictionaries are flattened and then delimited with a <code>.</code> to create column names. Parameters which are lists (or Python tuples, etc.) have a column for each entry with names that include an index (counting from 0). E.g. consider the following dictionary of parameters:</p>
+<pre><code class="language-py">param_dict: Dict[str, Any] = {
+    &quot;a&quot;: {               # First parameter a
+        &quot;b&quot;: (1, 2),
+        &quot;c&quot;: 1,
+        # ...
+    },
+    &quot;a2&quot;: 4,             # Second parameter a2
+    # ...
+}
+</code></pre>
+<p>The dictionary <code>a</code> will produce columns: <code>a.b[0]</code>, <code>a.b[1]</code>, <code>a.c</code>, and so on.</p>
 <h4 id="column-descriptions_2">Column descriptions</h4>
 <table>
 <thead>
@@ -1676,19 +1688,19 @@
 <td style="text-align: center;">The specific parameters of the <code>Task</code>. The <code>P{1..n}</code> are replaced by the actual parameter names.</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>task_status</code></td>
+<td style="text-align: center;"><code>result.task_status</code></td>
 <td style="text-align: center;">Reported exit status of the <code>Task</code>. Note that the output may still be labeled invalid by the <code>valid_flag</code> (see below).</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>summary</code></td>
+<td style="text-align: center;"><code>result.summary</code></td>
 <td style="text-align: center;">Short text summary of the <code>Task</code> result. This is provided by the <code>Task</code>, or sometimes the <code>Executor</code>.</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>payload</code></td>
+<td style="text-align: center;"><code>result.payload</code></td>
 <td style="text-align: center;">Full description of result from the <code>Task</code>. If the object is incompatible with the database, will instead be a pointer to where it can be found.</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>impl_schemas</code></td>
+<td style="text-align: center;"><code>result.impl_schemas</code></td>
 <td style="text-align: center;">A string of semi-colon separated schema(s) implemented by the <code>Task</code>. Schemas describe conceptually the type output the <code>Task</code> produces.</td>
 </tr>
 <tr>
@@ -1701,7 +1713,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>NOTE:</strong> The <code>payload</code> is distinct from the output files. Payloads are an optional summary of the results provided by the <code>Task</code>. E.g. this may include graphical descriptions of results (plots, figures, etc.). The output files themselves, if they exist, will most likely be pointed to be an output file parameter in one of the columns <code>P{1...n}</code></p>
+<p><strong>NOTE:</strong> The <code>result.payload</code> may be distinct from the output files. Payloads can be specified in terms of output parameters, specific output files, or are an optional summary of the results provided by the <code>Task</code>. E.g. this may include graphical descriptions of results (plots, figures, etc.). In many cases, however, the output files will most likely be pointed to by a parameter in one of the columns <code>P{1...n}</code> - if properly specified in the <code>TaskParameters</code> model the value of this output parameter will be replicated in the <code>result.payload</code> column as well..</p>
 <h2 id="api">API</h2>
 <p>This API is intended to be used at the <code>Executor</code> level, with some calls intended to provide default values for Pydantic models. Utilities for reading and inspecting the database outside of normal <code>Task</code> execution are addressed in the following subheader.</p>
 <h3 id="write">Write</h3>
