@@ -419,6 +419,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Writing the Task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-mpi-for-your-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using MPI for your Task
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#message-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Message signals
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1323,6 +1347,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Writing the Task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-mpi-for-your-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using MPI for your Task
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#message-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Message signals
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1724,13 +1772,15 @@ class RunTask2Parameters(ThirdPartyParameters):
 <p>There are more examples of this pattern spread throughout the various <code>Task</code> models.</p>
 <h3 id="specifying-an-executor-creating-a-runnable-managed-task">Specifying an <code>Executor</code>: Creating a runnable, "managed <code>Task</code>"</h3>
 <p><strong>Overview</strong></p>
-<p>After a pydantic model has been created, the next required step is to define a <strong>managed <code>Task</code></strong>. In the context of this library, a <strong>managed <code>Task</code></strong> refers to the combination of an <code>Executor</code> and a <code>Task</code> to run. The <code>Executor</code> manages the process of <code>Task</code> submission and the execution environment, as well as performing an logging, eLog communication, etc. There are currently two types of <code>Executor</code> to choose from. For most cases you will use the first option for third-party <code>Task</code>s.</p>
+<p>After a pydantic model has been created, the next required step is to define a <strong>managed <code>Task</code></strong>. In the context of this library, a <strong>managed <code>Task</code></strong> refers to the combination of an <code>Executor</code> and a <code>Task</code> to run. The <code>Executor</code> manages the process of <code>Task</code> submission and the execution environment, as well as performing any logging, eLog communication, etc. There are currently two types of <code>Executor</code> to choose from, <strong>but only one is applicable to third-party code.</strong> The second <code>Executor</code> is listed below for completeness only. If you need MPI see the note below.</p>
 <ol>
-<li><code>Executor</code>: This is the standard <code>Executor</code> and sufficient for most third-party uses cases.</li>
+<li><code>Executor</code>: This is the standard <code>Executor</code>. It should be used for third-party uses cases.</li>
 <li><code>MPIExecutor</code>: This performs all the same types of operations as the option above; however, it will submit your <code>Task</code> using MPI.</li>
 <li>The <code>MPIExecutor</code> will submit the <code>Task</code> using the number of available cores - 1. The number of cores is determined from the physical core/thread count on your local machine, or the number of cores allocated by SLURM when submitting on the batch nodes.</li>
 </ol>
-<p>As mentioned, for most cases you can setup a third-party <code>Task</code> to use the first type of <code>Executor</code>. If, however, your third-party <code>Task</code> uses MPI, you can use either. When using the standard <code>Executor</code> for a <code>Task</code> requiring MPI, the <code>executable</code> in the pydantic model must be set to <code>mpirun</code>. For example, a third-party <code>Task</code> model, that uses MPI but can be run with the <code>Executor</code> may look like the following. We assume this <code>Task</code> runs a Python script using MPI.</p>
+<p><strong>Using MPI with third-party <code>Task</code>s</strong></p>
+<p>As mentioned, you should setup a third-party <code>Task</code> to use the first type of <code>Executor</code>. If, however, your third-party <code>Task</code> uses MPI this may seem non-intuitive. When using the <code>MPIExecutor</code> LUTE code is submitted with MPI. This includes the code that performs signalling to the <code>Executor</code> and <code>exec</code>s the third-party code you are interested in running. While it is possible to set this code up to run with MPI, it is more challenging in the case of third-party <code>Task</code>s because there is no <code>Task</code> code to modify directly! The <code>MPIExecutor</code> is provided mostly for first-party code. This is not an issue, however, since the standard <code>Executor</code> is easily configured to run with MPI in the case of third-party code.</p>
+<p>When using the standard <code>Executor</code> for a <code>Task</code> requiring MPI, the <code>executable</code> in the pydantic model must be set to <code>mpirun</code>. For example, a third-party <code>Task</code> model, that uses MPI but is intended to be run with the <code>Executor</code> may look like the following. We assume this <code>Task</code> runs a Python script using MPI.</p>
 <pre><code class="language-py">class RunMPITaskParameters(ThirdPartyParameters):
     class Config(ThirdPartyParameters.Config):
         ...
@@ -2015,12 +2065,14 @@ In addition to the global configuration options there are a couple of ways to sp
 </tbody>
 </table>
 <h3 id="writing-the-task">Writing the <code>Task</code></h3>
-<p>You can write your analysis code (or whatever code to be executed) as long as it adheres to the limited rules below. You can create a new module for your <code>Task</code> in <code>lute.tasks</code> or add it to any existing module, if it makes sense for it to belong there. The <code>Task</code> itself is a single class constructed as:
-1. Your analysis <code>Task</code> is a class named in a way that matches its Pydantic model. E.g. <code>RunTask</code> is the <code>Task</code>, and <code>RunTaskParameters</code> is the Pydantic model.
-2. The class must inherit from the <code>Task</code> class (see template below).
-3. You must provide an implementation of a <code>_run</code> method. This is the method that will be executed when the <code>Task</code> is run. You can in addition write as many methods as you need. For fine-grained execution control you can also provide <code>_pre_run()</code> and <code>_post_run()</code> methods, but this is optional.
-4. For all communication (including print statements) you should use the <code>_report_to_executor(msg: Message)</code> method. Since the <code>Task</code> is run as a subprocess this method will pass information to the controlling <code>Executor</code>. You can pass <strong>any</strong> type of object using this method, strings, plots, arrays, etc.
-5. If you did not use the <code>set_result</code> configuration option in your parameters model, make sure to provide a result when finished. This is done by setting <code>self._result.payload = ...</code>. You can set the result to be any object. If you have written the result to a file, for example, please provide a path.</p>
+<p>You can write your analysis code (or whatever code to be executed) as long as it adheres to the limited rules below. You can create a new module for your <code>Task</code> in <code>lute.tasks</code> or add it to any existing module, if it makes sense for it to belong there. The <code>Task</code> itself is a single class constructed as:</p>
+<ol>
+<li>Your analysis <code>Task</code> is a class named in a way that matches its Pydantic model. E.g. <code>RunTask</code> is the <code>Task</code>, and <code>RunTaskParameters</code> is the Pydantic model.</li>
+<li>The class must inherit from the <code>Task</code> class (see template below). <strong>If you intend to use MPI see the following section.</strong></li>
+<li>You must provide an implementation of a <code>_run</code> method. This is the method that will be executed when the <code>Task</code> is run. You can in addition write as many methods as you need. For fine-grained execution control you can also provide <code>_pre_run()</code> and <code>_post_run()</code> methods, but this is optional.</li>
+<li>For all communication (including print statements) you should use the <code>_report_to_executor(msg: Message)</code> method. Since the <code>Task</code> is run as a subprocess this method will pass information to the controlling <code>Executor</code>. You can pass <strong>any</strong> type of object using this method, strings, plots, arrays, etc.</li>
+<li>If you did not use the <code>set_result</code> configuration option in your parameters model, make sure to provide a result when finished. This is done by setting <code>self._result.payload = ...</code>. You can set the result to be any object. If you have written the result to a file, for example, please provide a path.</li>
+</ol>
 <p>A minimal template is provided below.</p>
 <pre><code class="language-py">&quot;&quot;&quot;Standard docstring...&quot;&quot;&quot;
 
@@ -2061,6 +2113,29 @@ class RunTask(Task): # Inherit from Task
         # Optionally also set status - good practice but not obligatory
         self._result.task_status = TaskStatus.COMPLETED
 </code></pre>
+<h4 id="using-mpi-for-your-task">Using MPI for your <code>Task</code></h4>
+<p>In the case your <code>Task</code> is written to use <code>MPI</code> a slight modification to the template above is needed. Specifically, an additional keyword argument should be passed to the base class initializer: <code>use_mpi=True</code>. This tells the base class to adjust signalling/communication behaviour appropriately for a multi-rank MPI program. Doing this prevents tricky-to-track-down problems due to ranks starting, completing and sending messages at different times. The rest of your code can, as before, be written as you see fit. The use of this keyword argument will also synchronize the start of all ranks and wait until all ranks have finished to exit.</p>
+<pre><code class="language-py">&quot;&quot;&quot;Task which needs to run with MPI&quot;&quot;&quot;
+
+__all__ = [&quot;RunTask&quot;]
+__author__ = &quot;&quot; # Please include so we know who the SME is
+
+# Include any imports you need here
+
+from lute.execution.ipc import Message # Message for communication
+from lute.io.models.base import *      # For TaskParameters
+from lute.tasks.task import *          # For Task
+
+# Only the init is shown
+class RunMPITask(Task): # Inherit from Task
+    &quot;&quot;&quot;Task description goes here, or in __init__&quot;&quot;&quot;
+
+    # Signal the use of MPI!
+    def __init__(self, *, params: TaskParameters, use_mpi: bool = True) -&gt; None:
+        super().__init__(params=params, use_mpi=use_mpi) # Sets up Task, parameters, etc.
+        # That's it.
+</code></pre>
+<h4 id="message-signals">Message signals</h4>
 <p>Signals in <code>Message</code> objects are strings and can be one of the following:</p>
 <pre><code class="language-py">LUTE_SIGNALS: Set[str] = {
     &quot;NO_PICKLE_MODE&quot;,
@@ -2087,7 +2162,7 @@ def import_task(task_name: str) -&gt; Type[Task]:
         return RunXASAnalysis
 </code></pre>
 <h3 id="defining-an-executor">Defining an <code>Executor</code></h3>
-<p>The process of <code>Executor</code> definition is identical to the process as described for <code>ThirdPartyTask</code>s above.</p>
+<p>The process of <code>Executor</code> definition is identical to the process as described for <code>ThirdPartyTask</code>s above. The one exception is if you defined the <code>Task</code> to use MPI as described in the section above (Using MPI for your <code>Task</code>), you will likely consider using the <code>MPIExecutor</code>.</p>
 
 
 

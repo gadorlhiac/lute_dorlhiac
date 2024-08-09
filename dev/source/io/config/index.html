@@ -1417,6 +1417,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#io.config.TestMultiNodeCommunicationParameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      TestMultiNodeCommunicationParameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#io.config.TestParameters" class="md-nav__link">
     <span class="md-ellipsis">
       TestParameters
@@ -2203,6 +2212,15 @@
   <a href="#io.config.TestBinaryErrParameters" class="md-nav__link">
     <span class="md-ellipsis">
       TestBinaryErrParameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#io.config.TestMultiNodeCommunicationParameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      TestMultiNodeCommunicationParameters
     </span>
   </a>
   
@@ -7814,6 +7832,73 @@ positional argument instantiation of the <code>params</code> Field.</p>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Multi-threaded tes tbinary with non-zero exit code.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">p_arg1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of threads.&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="io.config.TestMultiNodeCommunicationParameters" class="doc doc-heading">
+            <code>TestMultiNodeCommunicationParameters</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="io.models.base.TaskParameters" href="../models/base/#io.models.base.TaskParameters">TaskParameters</a></code></p>
+
+
+      <p>Parameters for the test Task <code>TestMultiNodeCommunication</code>.</p>
+<p>Test verifies communication across multiple machines.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>lute/io/models/mpi_tests.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestMultiNodeCommunicationParameters</span><span class="p">(</span><span class="n">TaskParameters</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters for the test Task `TestMultiNodeCommunication`.</span>
+
+<span class="sd">    Test verifies communication across multiple machines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">send_obj</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;plot&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Object to send to Executor. `plot` or `array`&quot;</span>
+    <span class="p">)</span>
+    <span class="n">arr_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Size of array to send back to Executor.&quot;</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
