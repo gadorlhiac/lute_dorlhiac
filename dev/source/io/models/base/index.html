@@ -2618,6 +2618,7 @@ are stored in order to properly handle ThirdPartyParameter objects.</p>
               Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
+
         <p>Header information for LUTE analysis runs.</p>
 
 
@@ -2627,7 +2628,7 @@ are stored in order to properly handle ThirdPartyParameter objects.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
 <span class="normal"> 48</span>
@@ -2786,6 +2787,7 @@ are stored in order to properly handle ThirdPartyParameter objects.</p>
               Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
 
 
+
         <p>Base class for models of task parameters to be validated.</p>
 <p>Parameters are read from a configuration YAML file and validated against
 subclasses of this type in order to ensure that both all parameters are
@@ -2807,7 +2809,7 @@ int).</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
 <span class="normal">109</span>
@@ -3065,6 +3067,7 @@ int).</p>
     <div class="doc doc-contents ">
 
 
+
         <p>Configuration for parameters model.</p>
 <p>The Config class holds Pydantic configuration. A number of LUTE-specific
 configuration has also been placed here.</p>
@@ -3199,7 +3202,7 @@ stored in the database, however. Only used if <code>set_result==True</code></p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
 <span class="normal">124</span>
@@ -3486,7 +3489,7 @@ stored in the database, however. Only used if <code>set_result==True</code></p>
         <p>Override the default schema to include Config information.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/io/models/base.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
 <span class="normal">191</span>
@@ -3581,6 +3584,7 @@ stored in the database, however. Only used if <code>set_result==True</code></p>
               Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
+
         <p>Parameters used for templating of third party configuration files.</p>
 
 
@@ -3628,7 +3632,7 @@ rendered template to.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">349</span>
 <span class="normal">350</span>
@@ -3693,6 +3697,7 @@ rendered template to.</p>
     <div class="doc doc-contents ">
 
 
+
         <p>Class for representing parameters for third party configuration files.</p>
 <p>These parameters can represent arbitrary data types and are used in
 conjunction with templates for modifying third party configuration files
@@ -3711,7 +3716,7 @@ positional argument instantiation of the <code>params</code> Field.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">224</span>
 <span class="normal">225</span>
@@ -3786,6 +3791,7 @@ positional argument instantiation of the <code>params</code> Field.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="TaskParameters (io.models.base.TaskParameters)" href="#io.models.base.TaskParameters">TaskParameters</a></code></p>
 
 
+
         <p>Base class for third party task parameters.</p>
 <p>Contains special validators for extra arguments and handling of parameters
 used for filling in third party configuration files.</p>
@@ -3797,7 +3803,7 @@ used for filling in third party configuration files.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">243</span>
 <span class="normal">244</span>
@@ -4037,6 +4043,7 @@ used for filling in third party configuration files.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="Config (io.models.base.TaskParameters.Config)" href="#io.models.base.TaskParameters.Config">Config</a></code></p>
 
 
+
         <p>Configuration for parameters model.</p>
 <p>The Config class holds Pydantic configuration and inherited configuration
 from the base <code>TaskParameters.Config</code> class. A number of values are also
@@ -4230,7 +4237,7 @@ are passed as <code>--long=arg</code>. ThirdPartyTask-specific.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/io/models/base.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
 <span class="normal">251</span>

@@ -3040,7 +3040,8 @@ zmq. Supports both TCP and Unix sockets.</p>
 
 
 
-              <details class="quote">
+
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/execution/ipc.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
 <span class="normal">119</span>
@@ -3261,7 +3262,7 @@ sending it.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
 <span class="normal">120</span>
@@ -3306,7 +3307,7 @@ sending it.</p>
         <p>Alternative exit method outside of context manager.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">167</span>
 <span class="normal">168</span>
@@ -3333,7 +3334,7 @@ sending it.</p>
         <p>Any setup that should be done later than init.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
 <span class="normal">172</span>
@@ -3364,7 +3365,7 @@ sending it.</p>
         <p>Method for reading data through the communication mechanism.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">132</span>
 <span class="normal">133</span>
@@ -3393,7 +3394,7 @@ sending it.</p>
         <p>Alternative method for staging outside of context manager.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
 <span class="normal">164</span>
@@ -3424,7 +3425,7 @@ sending it.</p>
         <p>Method for sending data through the communication mechanism.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
 <span class="normal">138</span>
@@ -3463,6 +3464,7 @@ sending it.</p>
               Bases: <code><span title="enum.Enum">Enum</span></code></p>
 
 
+
         <p>Identifier for which party (side/end) is using a communicator.</p>
 <p>For some types of communication streams there may be different interfaces
 depending on which side of the communicator you are on. This enum is used
@@ -3475,7 +3477,7 @@ by the communicator to determine which interface to use.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/execution/ipc.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
@@ -3594,6 +3596,7 @@ by the communicator to determine which interface to use.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="Communicator (execution.ipc.Communicator)" href="#execution.ipc.Communicator">Communicator</a></code></p>
 
 
+
         <p>Provides communication through pipes over stderr/stdout.</p>
 <p>The implementation of this communicator has reading and writing ocurring
 on stderr and stdout. In general the <code>Task</code> will be writing while the
@@ -3606,7 +3609,7 @@ on stderr and stdout. In general the <code>Task</code> will be writing while the
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/execution/ipc.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
 <span class="normal">177</span>
@@ -4061,7 +4064,7 @@ sending it. If False, data is assumed to be text whi</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">184</span>
 <span class="normal">185</span>
@@ -4183,7 +4186,7 @@ Otherwise, None.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
 <span class="normal">256</span>
@@ -4384,7 +4387,7 @@ Otherwise, None.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
 <span class="normal">200</span>
@@ -4548,7 +4551,7 @@ Otherwise, None.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">319</span>
 <span class="normal">320</span>
@@ -4661,6 +4664,7 @@ Otherwise, None.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="Communicator (execution.ipc.Communicator)" href="#execution.ipc.Communicator">Communicator</a></code></p>
 
 
+
         <p>Provides communication over Unix or TCP sockets.</p>
 <p>Communication is provided either using sockets with the Python socket library
 or using ZMQ. The choice of implementation is controlled by the global bool
@@ -4707,7 +4711,7 @@ machine and Executor machine.</p>
 
 
 
-              <details class="quote">
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>lute/execution/ipc.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 362</span>
 <span class="normal"> 363</span>
@@ -5400,15 +5404,15 @@ machine and Executor machine.</p>
 <span class="sd">    machine and Executor machine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">ACCEPT_TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">ACCEPT_TIMEOUT</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximum time to wait to accept connections. Used by Executor-side.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">MSG_HEAD</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;MSG&quot;</span>
+    <span class="n">MSG_HEAD</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;MSG&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Start signal of a message. The end of a message is indicated by MSG_HEAD[::-1].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">MSG_SEP</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;;;;&quot;</span>
+    <span class="n">MSG_SEP</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;;;;&quot;</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Separator for parts of a message. Messages have a start, length, message and end.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -6024,7 +6028,6 @@ machine and Executor machine.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h3>
@@ -6047,7 +6050,6 @@ machine and Executor machine.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h3>
@@ -6070,7 +6072,6 @@ machine and Executor machine.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h3>
@@ -6157,7 +6158,7 @@ passing False does not change behaviour.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
 <span class="normal">421</span>
@@ -6206,7 +6207,7 @@ passing False does not change behaviour.</p>
         <p>Clean up connections.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">974</span>
 <span class="normal">975</span>
@@ -6302,7 +6303,7 @@ variables controlling the behaviour of these two communication types.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">657</span>
 <span class="normal">658</span>
@@ -6412,7 +6413,7 @@ variables controlling the behaviour of these two communication types.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">687</span>
 <span class="normal">688</span>
@@ -6507,7 +6508,7 @@ variables controlling the behaviour of these two communication types.</p>
         <p>Find a random open port to bind to if using TCP.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">728</span>
 <span class="normal">729</span>
@@ -6587,7 +6588,7 @@ variables controlling the behaviour of these two communication types.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">835</span>
 <span class="normal">836</span>
@@ -6684,7 +6685,7 @@ will exit.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">747</span>
 <span class="normal">748</span>
@@ -6836,7 +6837,7 @@ object instead of returning one.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">797</span>
 <span class="normal">798</span>
@@ -6956,7 +6957,7 @@ Executor processes are on different machines.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">858</span>
 <span class="normal">859</span>
@@ -7100,7 +7101,7 @@ object instead of returning one.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">904</span>
 <span class="normal">905</span>
@@ -7186,7 +7187,7 @@ available.</p>
 <p>Calls an underlying method for either raw sockets or ZMQ.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">501</span>
 <span class="normal">502</span>
@@ -7242,7 +7243,7 @@ available.</p>
 <p>Raw socket implementation for the reader thread.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">519</span>
 <span class="normal">520</span>
@@ -7306,7 +7307,7 @@ available.</p>
 <p>ZMQ implementation for the reader thread.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">541</span>
 <span class="normal">542</span>
@@ -7377,7 +7378,7 @@ Task machine and Executor machine.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">936</span>
 <span class="normal">937</span>
@@ -7512,7 +7513,7 @@ message to multiple full messages.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">552</span>
 <span class="normal">553</span>
@@ -7667,7 +7668,7 @@ message to multiple full messages.</p>
 <p>This structure is used for decoding the message on the other end.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">617</span>
 <span class="normal">618</span>
@@ -7742,7 +7743,7 @@ acquisition of socket resources until a single Executor is ready
 to use them.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">435</span>
 <span class="normal">436</span>
@@ -7902,7 +7903,7 @@ compatibility with other Communicator subtypes. Is ignored.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">480</span>
 <span class="normal">481</span>
@@ -7996,7 +7997,7 @@ a connection over Unix socket.</p>
     </table>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>lute/execution/ipc.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">643</span>
 <span class="normal">644</span>
