@@ -17,7 +17,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -3232,7 +3232,7 @@ FindPeaksSFX:
 <p>In the <code>utilities</code> directory (in the main <code>lute</code> directory) there are two useful programs to provide assistance with using the software:</p>
 <ul>
 <li><code>utilities/dbview</code>: LUTE stores all parameters for every analysis routine it runs (as well as results) in a database. This database is stored in the <code>work_dir</code> defined in the YAML file. The <code>dbview</code> utility is a TUI application (Text-based user interface) which runs in the terminal. It allows you to navigate a LUTE database using the arrow keys, etc. Usage is: <code>utilities/dbview -p &lt;path/to/lute.db&gt;</code>. You will only have a database after your first <strong>managed</strong> <code>Task</code> completes (whether it succeeds or not). (<strong>NOTE:</strong> If using the new database specification v0.2, you can additionally pass the <code>--summarize</code> option to <code>utilities/dbview</code>. This will pivot and reorganize the data since the table structure is harder to parse at a glance in the new specification.)</li>
-<li><code>utilities/help</code>: Source code here builds the <code>lute_help</code> utility. This utility provides help and usage information for running LUTE software. It provides access to parameter descriptions to assist in properly filling out a configuration YAML. It's usage is described in slightly more detail in the <code>Usage Manual</code>. Briefly you can run <code>lute_help -t &lt;TaskName&gt;</code> to retrieve parameters for a single <code>Task</code> (to put in your configuration YAML), or <code>lute_help -l</code> to list all <code>Task</code>s (and their associated <strong>managed</strong> <code>Task</code>s).</li>
+<li><code>utilities/help</code>: Source code here builds the <code>lute_help</code> utility. This utility provides help and usage information for running LUTE software. It provides access to parameter descriptions to assist in properly filling out a configuration YAML. It's usage is described in slightly more detail in the <code>Usage Manual</code>. Briefly you can run <code>lute_help -t &lt;TaskName&gt;</code> to retrieve parameters for a single <code>Task</code> (to put in your configuration YAML), or <code>lute_help -l</code> to list all <code>Task</code>s (and their associated <strong>managed</strong> <code>Task</code>s). You can also use <code>lute_help -e [&lt;var&gt;]</code> to get information about configuration available via environment variable.</li>
 <li><code>utilities/setup</code>: Source code for building the setup script described at the top.</li>
 <li><code>utilities/lute_cfg</code>: Source code for the <code>lute_cfg</code> utility for reconstructing YAML files from the LUTE database. Sourcing the LUTE <code>activate_installation</code> script for a given installation will add this utility to your PATH.</li>
 </ul>
@@ -3292,7 +3292,7 @@ FindPeaksSFX:
       <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
