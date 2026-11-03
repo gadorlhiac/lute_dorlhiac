@@ -49,6 +49,12 @@ def main():
         "A light-weight workflow manager which executes LUTE Managed Tasks."
     )
     parser.add_argument(
+        "--launcher_type",
+        type=int,
+        help="Select process Launcher to use: 1 == Python, 2 == SLURM. Default: 2.",
+        default=2,
+    )
+    parser.add_argument(
         "--num_server_threads",
         type=int,
         help="Number of threads to use for the HTTP server.",
@@ -65,10 +71,22 @@ def main():
 
     args, extra_args = parser.parse_known_args()
 
-    launch_info = setup_launch_env(args)
-    experiment = launch_info["experiment"]
-    run_num = launch_info["run_num"]
-    jid_authorization = launch_info["authorization"]
+    launcher_type: _maestro.LauncherType
+    if args.launcher_type == 1:
+        launcher_type = _maestro.LauncherType.PythonLauncherType
+    elif args.launcher_type == 2:
+        launcher_type = _maestro.LauncherType.SlurmLauncherType
+    else:
+        raise RuntimeError(
+            f"Unknonw LauncherType requested (`{args.launcher_type}`)! Select 1 or 2!"
+        )
+
+    # All environment modification is done through LaunchContext below
+    # so add_to_env is False
+    launch_env = setup_launch_env(args, add_to_env=False)
+    experiment = launch_env["experiment"]
+    run_num = launch_env["run_num"]
+    jid_authorization = launch_env["authorization"]
 
     run_type, is_daq2 = retrieve_run_info(
         experiment, run_num, jid_authorization, args.type
@@ -96,9 +114,16 @@ def main():
     manager_port: Optional[int] = find_random_port()
     if manager_port is None:
         raise RuntimeError("Cannot bind a port!")
-    os.environ["LUTE_MANAGER_URL"] = f"{manager_host}:{manager_port}"
 
-    launch_env: Dict[str, str] = {"LUTE_MANAGER_URL": f"{manager_host}:{manager_port}"}
+    executor_env: Dict[str, str] = {
+        "LUTE_MANAGER_URL": f"{manager_host}:{manager_port}"
+    }
+    for k, v in launch_env.items():
+        if isinstance(v, str):
+            executor_env[k] = v
+        else:
+            # Convert a potentially None kerb_file to empty string
+            executor_env[k] = ""
 
     # Setup extra arguments
     extra_launch_args: List[str] = []
@@ -116,7 +141,7 @@ def main():
     launch_ctx: _maestro.LaunchContext = _maestro.LaunchContext(
         workflow_id="",  # Left empty, will be generated
         env_policy=env_policy,
-        env=launch_env,
+        env=executor_env,
         extra_launch_args=extra_launch_args,
         labels=launch_labels,
     )
@@ -127,7 +152,7 @@ def main():
         unbuffered_logs=args.unbuffered,
         host="0.0.0.0",
         port=manager_port,
-        launch_type=_maestro.LauncherType.SlurmLauncherType,
+        launch_type=launcher_type,
         context=launch_ctx,
         run_type=run_type,
     )
