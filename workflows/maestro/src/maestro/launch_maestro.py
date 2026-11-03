@@ -49,10 +49,24 @@ def main():
         "A light-weight workflow manager which executes LUTE Managed Tasks."
     )
     parser.add_argument(
+        "--env_policy",
+        type=int,
+        help=(
+            "Select policy for what maestro provides to the managed Task environment.\n"
+            " - 0 == REPLACE: LaunchContext fully determines env.\n"
+            " - 1 == MERGE: LaunchContext env merged with the maestro env.\n"
+            " - 2 == IGNORE: LaunchContext env ignored. Task receives maestro env.\n"
+            "Default: 1 (MERGE)."
+        ),
+        default=1,
+        choices=[0, 1, 2],
+    )
+    parser.add_argument(
         "--launcher_type",
         type=int,
         help="Select process Launcher to use: 1 == Python, 2 == SLURM. Default: 2.",
         default=2,
+        choices=[1, 2],
     )
     parser.add_argument(
         "--num_server_threads",
@@ -136,7 +150,15 @@ def main():
         "run_type": run_type,
     }
 
-    env_policy: _maestro.LaunchEnvPolicy = _maestro.LaunchEnvPolicy.CTX_MERGE
+    env_policy: _maestro.LaunchEnvPolicy
+    if args.env_policy == 0:
+        env_policy = _maestro.LaunchEnvPolicy.CTX_REPLACE
+    elif args.env_policy == 1:
+        env_policy = _maestro.LaunchEnvPolicy.CTX_MERGE
+    elif args.env_policy == 2:
+        env_policy = _maestro.LaunchEnvPolicy.CTX_IGNORE
+    else:
+        raise RuntimeError("Environment Policy (--env_policy) must be 0, 1, or 2!")
 
     launch_ctx: _maestro.LaunchContext = _maestro.LaunchContext(
         workflow_id="",  # Left empty, will be generated
