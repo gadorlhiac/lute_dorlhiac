@@ -475,20 +475,39 @@ namespace LWM {
           }
         }
 
-        full_msg += "}";
+        if (full_msg.find("message") != std::string::npos) {
+          full_msg += "}";
 
-        HTTP::Response response(HTTP::CODE::OK);
-        response.set_header("Content-Type", "application/json");
-        response.set_content(full_msg);
+          HTTP::Response response(HTTP::CODE::OK);
+          response.set_header("Content-Type", "application/json");
+          response.set_content(full_msg);
+
+          return response;
+        } else {
+          // No message found, but check if the job exists
+          auto mtasks_in_wf = JobIdentifier::find_matching(m_status_handler->m_status_map,
+                                                           working_job_id,
+                                                           &JobIdentifier::compatible);
+          if (!mtasks_in_wf.empty()) {
+            HTTP::Response response(HTTP::CODE::OK);
+            response.set_header("Content-Type", "application/json");
+            response.set_content("{ \"message\": null }");
+
+            return response;
+          } else {
+            // The job key is not registered at all.
+            HTTP::Response response(HTTP::CODE::NotFound);
+            response.set_content("Requested job_key " + job_key + " was not found!");
+
+            return response;
+          }
+        }
+      } else {
+        HTTP::Response response(HTTP::CODE::BadRequest);
+        response.set_content("Must provide a job_key, either in body or as query parameter!");
 
         return response;
       }
-
-      HTTP::Response response(HTTP::CODE::OK);
-      response.set_header("Content-Type", "application/json");
-      response.set_content("{ \"message\": null }");
-
-      return response;
     }
 
     return HTTP::Response(HTTP::CODE::MethodNotAllowed);
