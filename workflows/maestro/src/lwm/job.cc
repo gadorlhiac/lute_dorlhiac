@@ -25,17 +25,10 @@ namespace LWM {
 
   bool JobIdentifier::same_dag(const JobIdentifier& id_a, const JobIdentifier& id_b) {
     if (!id_a.job_key.empty() && !id_b.job_key.empty()) {
-      const std::string prefix_key {
-        id_a.job_key.size() > id_b.job_key.size() ? id_b.job_key : id_a.job_key
-      };
-      const std::string job_key {
-        id_a.job_key.size() > id_b.job_key.size() ? id_a.job_key : id_b.job_key
-      };
+      const std::string wf_id_a { id_a.job_key.substr(0, id_a.job_key.find('/')) };
+      const std::string wf_id_b { id_b.job_key.substr(0, id_b.job_key.find('/')) };
 
-      const std::size_t pos { prefix_key.size() };
-      if (job_key.compare(0, pos, prefix_key) == 0) {
-        return true;
-      }
+      return wf_id_a == wf_id_b;
     }
 
     return false;
