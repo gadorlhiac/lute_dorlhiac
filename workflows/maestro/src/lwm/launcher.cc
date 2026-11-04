@@ -191,42 +191,114 @@ namespace LWM {
   }
 
   HTTP::Response JsonTasksHandler::operator()(const HTTP::Request& request) {
-    std::string json_res = "{ \"managed_tasks\": [";
+    // For /tasks can filter by the DAG (workflow) using wf_id. Otherwsie,
+    // will return the list across ALL the running DAGs.
+    // Accept the filter both as a query parameter, and in the request body:
+    // GET /tasks?wf_id=lute_1234 or { "wf_id": "lute_1234" }.
+    std::string wf_id;
+
+    std::size_t pos { request.url().find("wf_id=") };
+    if (pos != std::string::npos) {
+      wf_id = request.url().substr(pos + 6);
+      // Double check no ampersand
+      std::size_t amp_pos { wf_id.find('&') };
+      if (amp_pos != std::string::npos) {
+        wf_id = wf_id.substr(0, amp_pos);
+      }
+    }
+
+    if (wf_id.empty()) {
+      std::map<std::string, std::string> tasks_data;
+      parse_json(request.content(), tasks_data);
+      auto it { tasks_data.find("wf_id") };
+      if (it != tasks_data.end()) {
+        wf_id = it->second;
+      }
+    }
+
+    std::string json_res;
+    if (!wf_id.empty()) {
+      // For a single DAG, remove the outer DAG identifier and return managed
+      // Tasks list only.
+      json_res = "{ \"managed_tasks\": [";
+    } else {
+      // Otherwise, we will have "{ "DAGs": [ { "managed_tasks": [], "wf_id": "" }, ... } ] }"
+      //json_res = "{ \"DAGs\": [ { \"managed_tasks\": [";
+      json_res += "{ \"DAGs\": [";
+    }
     {
       std::lock_guard<std::mutex> lock(m_status_handler->m_status_mut);
-      bool first = true;
+      bool first { true };
 
-      // I kinda regret how I set this up now... but will recombine
-      // stuff into a single map to do the JSON string conversion
-      // TODO: Probably need to restructure all this key/val handling to be smarter...
-      for (const auto& [job_id, status] : m_status_handler->m_status_map) {
-        if (!first) {
+      auto it { m_status_handler->m_status_map.begin() };
+      std::string working_wf_id; // The currently iterated DAG id for comparisons
+      JobIdentifier working_wf;  // Pred functions match on JobIdentifier instances
+      while (true) {
+        if (it == m_status_handler->m_status_map.end()) {
+          // Iterated all of them - close outer list and dict
+          // Whether its one workflow requested, or all, the close out is the same
+          // The inner dicts/lists are closed out each time, below
+          json_res += "] }";
+          break;
+        }
+
+        if (!working_wf_id.empty()) {
           json_res += ", ";
         }
 
-        const std::string& managed_task_name {
-          job_id.name.has_value() ? *(job_id.name) : ""
-        };
+        json_res += "{ \"managed_tasks\": [";
 
-        std::map<std::string, std::string> json_map;
-        json_map["name"] = managed_task_name;
-        json_map["status"] = status;
+        std::size_t pos { it->first.job_key.find("/") };
+        working_wf_id = it->first.job_key.substr(0, pos);
+        working_wf = JobIdentifier { working_wf_id + "/" };
 
-        if (m_status_handler->m_metadata_map.count(job_id)) {
-          const auto& task_meta = m_status_handler->m_metadata_map[job_id];
-          json_map.insert(task_meta.begin(), task_meta.end());
+        bool allow_prefix { true };
+        auto mtasks_in_wf = JobIdentifier::find_matching(m_status_handler->m_status_map,
+                                                         working_wf,
+                                                         &JobIdentifier::same_dag,
+                                                         allow_prefix);
+
+        for (const auto& match : mtasks_in_wf) {
+          const auto& job_id { match->first };
+          const auto& status { match->second };
+          const std::string& managed_task_name {
+            job_id.name.has_value() ? *(job_id.name) : ""
+          };
+
+          std::map<std::string, std::string> json_map;
+          json_map["name"] = managed_task_name;
+          json_map["status"] = status;
+
+          if (m_status_handler->m_metadata_map.count(job_id)) {
+            const auto& task_meta { m_status_handler->m_metadata_map[job_id] };
+            json_map.insert(task_meta.begin(), task_meta.end());
+          }
+
+          try {
+            json_res += to_json_str(json_map);
+            first = false;
+          } catch (const HTTP::InvalidJsonMaps& e) {
+            m_logger->error("Can't JSONify data for: " + managed_task_name + ". " + e.what());
+          }
+
+          it = match;
         }
+        // Close list following iteration of each singel DAG
+        json_res += "]";
+        if (wf_id.empty()) {
+          // If we are iterating all DAGs, include the wf_id for what we just finished
+          // in the response and close off the dict.
+          json_res += ", \"wf_id\": \"" + working_wf_id + "\" }";
 
-        try {
-          json_res += to_json_str(json_map);
-          first = false;
-        } catch (const HTTP::InvalidJsonMaps& e) {
-          m_logger->error("Can't JSONify data for: " + managed_task_name + ". " + e.what());
+          it++; // Advance to next DAG ID
+        } else {
+          // If we only requested a single workflow, break now after closing out
+          json_res += " }";
+          break;
         }
       }
     }
 
-    json_res += "] }";
     m_logger->debug("Created response: {}", json_res);
 
     HTTP::Response response(HTTP::CODE::OK);

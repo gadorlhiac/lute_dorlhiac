@@ -23,6 +23,24 @@ namespace LWM {
     }
   }
 
+  bool JobIdentifier::same_dag(const JobIdentifier& id_a, const JobIdentifier& id_b) {
+    if (!id_a.job_key.empty() && !id_b.job_key.empty()) {
+      const std::string prefix_key {
+        id_a.job_key.size() > id_b.job_key.size() ? id_b.job_key : id_a.job_key
+      };
+      const std::string job_key {
+        id_a.job_key.size() > id_b.job_key.size() ? id_a.job_key : id_b.job_key
+      };
+
+      const std::size_t pos { prefix_key.size() };
+      if (job_key.compare(0, pos, prefix_key) == 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   bool JobIdentifier::matches(const JobIdentifier& partial, const JobIdentifier& full) {
     if (!partial.job_key.empty() && partial.job_key != full.job_key) {
       return false;

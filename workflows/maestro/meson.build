@@ -137,6 +137,7 @@ test_maestro_api = executable(
         'src/lwm/job.cc',
         'src/lwm/job_registry.cc',
         'src/parallel/threadpool.cc',
+        'src/util/uuid.cc',
     ],
     dependencies: [
         gtest_dep,

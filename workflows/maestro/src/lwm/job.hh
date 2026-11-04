@@ -55,6 +55,23 @@ namespace LWM {
     }
 
     /**
+     * Check whether two JobIdentifiers are for steps within the same DAG.
+     *
+     * As the first portion of the job_key is the workflow identifier, the check
+     * amounts to a comparison of the prefixes of the job_key.
+     *
+     * @note One of the identifiers may be a partial job_key containing only the
+     *       workflow identifier. This then serves to help filter all jobs within
+     *       a DAG.
+     *
+     * @param[in] job_id A JobIdentifier to compare.
+     * @param[in] wf_id A JobIdentifier, or a partial constructed with just the
+     *            workflow ID in the job_key.
+     * @returns true if they are from the same DAG, otherwise false.
+     */
+    static bool same_dag(const JobIdentifier& job_id, const JobIdentifier& wf_id);
+
+    /**
      * Check for partially filled JobIdentifier matches.
      *
      * @note This routine is one-directional! It requires that the stored value have
@@ -80,6 +97,8 @@ namespace LWM {
      * @param[in] pred The matching/lookup predicate for field comparisons. Defaults
      *            to JobIdentifier::matches. See notes there on ordering and partial
      *            JobIdentifiers.
+     * @param[in] allow_prefix If true, allow matches on job key prefixes (e.g., to
+     *            scan the DAG/workflow IDs which are a component of the job key)
      * @returns A vector of iterators to the found matches.
      */
     template <typename Map, typename Pred = decltype(&matches)>
@@ -88,7 +107,8 @@ namespace LWM {
     }
     static inline auto find_matching(Map& id_map,
                                      const JobIdentifier& partial,
-                                     Pred&& pred = &matches) {
+                                     Pred&& pred = &matches,
+                                     bool allow_prefix = false) {
       using ItType = decltype(id_map.begin());
       using ObjType = std::iter_reference_t<ItType>;
 
@@ -105,7 +125,7 @@ namespace LWM {
         auto it { id_map.lower_bound(JobIdentifier { partial.job_key }) };
         while (it != id_map.end()) {
           const auto& job_id { key_for(it) };
-          if (job_id.job_key != partial.job_key) {
+          if (!allow_prefix && job_id.job_key != partial.job_key) {
             break;
           } else if (pred(partial, job_id)) {
             out.push_back(it);

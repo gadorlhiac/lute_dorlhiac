@@ -1,5 +1,6 @@
 #include "lwm/launcher.hh"
 #include "server/http.hh"
+#include "util/uuid.hh"
 
 #include <gtest/gtest.h>
 
@@ -24,9 +25,13 @@ protected:
   }
 };
 
+static const std::string DAG_ID_0 { "lute_wf_" + LWM::uuid_v7() };
+
 TEST_F(MaestroAPITest, StatusUpdateBasic) {
   // Basic status update
-  std::string content = "{\"managed_task\": \"test_task\", \"status\": \"STARTED\"}";
+  std::string content {
+    "{\"managed_task\": \"test_task\", \"status\": \"STARTED\", \"mtask_job_key\": \"" + DAG_ID_0 + "/0\" }"
+  };
   Request req;
   req.set_method(METHOD::POST);
   req.set_url("/status");
@@ -39,8 +44,14 @@ TEST_F(MaestroAPITest, StatusUpdateBasic) {
 
 TEST_F(MaestroAPITest, StatusUpdateExtended) {
   // Extended metadata update
-  std::string content = "{\"managed_task\": \"test_task\", \"status\": \"RUNNING\", \"step\": "
-                        "\"1\", \"custom_key\": \"custom_val\"}";
+  std::string content {
+    "{ \"managed_task\": \"test_task\", "
+      "\"status\": \"RUNNING\","
+      "\"step\": \"1\","
+      "\"custom_key\": \"custom_val\","
+      "\"mtask_job_key\": \"" + DAG_ID_0 + "/0\""
+    "}"
+  };
   Request req;
   req.set_method(METHOD::POST);
   req.set_url("/status");
@@ -66,10 +77,33 @@ TEST_F(MaestroAPITest, StatusUpdateExtended) {
   EXPECT_NE(tasks_content.find("\"custom_key\":\"custom_val\""), std::string::npos);
 }
 
-TEST_F(MaestroAPITest, TasksListEmpty) {
+TEST_F(MaestroAPITest, DAGsTasksListEmpty) {
   Request req;
   req.set_method(METHOD::GET);
   req.set_url("/tasks");
+
+  Response res = (*tasks_handler)(req);
+  EXPECT_EQ(res.status_code(), CODE::OK);
+  EXPECT_EQ(res.content(), "{ \"DAGs\": [] }");
+}
+
+TEST_F(MaestroAPITest, TasksListEmpty) {
+  Request req;
+  req.set_method(METHOD::GET);
+  req.set_url("/tasks?wf_id=" + DAG_ID_0);
+
+  Response res = (*tasks_handler)(req);
+  EXPECT_EQ(res.status_code(), CODE::OK);
+  EXPECT_EQ(res.content(), "{ \"managed_tasks\": [] }");
+}
+
+TEST_F(MaestroAPITest, TasksListEmptyReqBody) {
+  Request req;
+  req.set_method(METHOD::GET);
+  req.set_url("/tasks");
+
+  std::string wf_id_body { "{\"wf_id\": \"" + DAG_ID_0 + "\"}"};
+  req.set_content(wf_id_body);
 
   Response res = (*tasks_handler)(req);
   EXPECT_EQ(res.status_code(), CODE::OK);
