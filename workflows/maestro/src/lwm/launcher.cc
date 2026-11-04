@@ -223,12 +223,10 @@ namespace LWM {
       json_res = "{ \"managed_tasks\": [";
     } else {
       // Otherwise, we will have "{ "DAGs": [ { "managed_tasks": [], "wf_id": "" }, ... } ] }"
-      //json_res = "{ \"DAGs\": [ { \"managed_tasks\": [";
       json_res += "{ \"DAGs\": [";
     }
     {
       std::lock_guard<std::mutex> lock(m_status_handler->m_status_mut);
-      bool first { true };
 
       auto it { m_status_handler->m_status_map.begin() };
       std::string working_wf_id; // The currently iterated DAG id for comparisons
@@ -249,7 +247,7 @@ namespace LWM {
         json_res += "{ \"managed_tasks\": [";
 
         std::size_t pos { it->first.job_key.find("/") };
-        working_wf_id = it->first.job_key.substr(0, pos);
+        working_wf_id = wf_id.empty() ? it->first.job_key.substr(0, pos) : wf_id;
         working_wf = JobIdentifier { working_wf_id + "/" };
 
         bool allow_prefix { true };
@@ -258,7 +256,12 @@ namespace LWM {
                                                          &JobIdentifier::same_dag,
                                                          allow_prefix);
 
+        bool first { true };
         for (const auto& match : mtasks_in_wf) {
+          if (!first) {
+            json_res += ", ";
+          }
+
           const auto& job_id { match->first };
           const auto& status { match->second };
           const std::string& managed_task_name {
@@ -320,87 +323,165 @@ namespace LWM {
         JobRegistry::set_last_update_time_by_launch(launch_id, ts);
       }
 
-      auto tgt_key_it { rpc_data.find("target_key") };
+      HTTP::Response response;
+
+      // In addition to the target managed Task, and the message, the RPC request must
+      // be constrained to a specific DAG. Either the DAG id must be provided (all steps
+      // within the same DAG have theirs) or the job_key, if known, can be attached.
+      auto tgt_key_it { rpc_data.find("target") };
       auto tgt_msg_it { rpc_data.find("message") };
       if (tgt_key_it != rpc_data.end() && tgt_msg_it != rpc_data.end()) {
         const auto& tgt_key { tgt_key_it->second };
         const auto& tgt_msg { tgt_msg_it->second };
 
         try {
-          auto job_id { JobRegistry::job_id_from_key(tgt_key) };
-          {
+          auto tgt_job_key_it { rpc_data.find("job_key") };
+          auto tgt_wf_id_it { rpc_data.find("wf_id") };
+          if (tgt_job_key_it != rpc_data.end()) {
+            // If the full job key is known, it can be used directly.
+            const auto& tgt_job_key { tgt_job_key_it->second };
+
             std::lock_guard<std::mutex> lock(m_status_handler->m_status_mut);
-            m_status_handler->m_rpc_queues[job_id].push(tgt_msg);
+            JobIdentifier working_job_id { tgt_job_key }; // Pred functions match on JobIdentifier instances
+            // Use the same mapping for both (i.e., dont go via registry)
+            auto matching_jid = JobIdentifier::find_matching(m_status_handler->m_status_map,
+                                                             working_job_id,
+                                                             &JobIdentifier::compatible);
+            if (!matching_jid.empty()) {
+              m_status_handler->m_rpc_queues[matching_jid.front()->first].push(tgt_msg);
+
+              response.set_status_code(HTTP::CODE::OK);
+              response.set_content("Message queued.");
+            } else {
+              response.set_status_code(HTTP::CODE::BadRequest);
+              response.set_content("Requested target is not registered!");
+            }
+          } else if (tgt_wf_id_it != rpc_data.end()) {
+            // Otherwise, must at least provide the workflow ID (so no targetting arbitrary DAGs)
+            const std::string working_wf_id { tgt_wf_id_it->second };
+            JobIdentifier working_wf { working_wf_id + "/" }; // Pred functions match on JobIdentifier instances
+
+            const bool allow_prefix { true };
+            std::lock_guard<std::mutex> lock(m_status_handler->m_status_mut);
+            auto mtasks_in_wf = JobIdentifier::find_matching(m_status_handler->m_status_map,
+                                                             working_wf,
+                                                             &JobIdentifier::same_dag,
+                                                             allow_prefix);
+            bool found { false };
+            for (const auto& match : mtasks_in_wf) {
+              const auto& job_id { match->first };
+              // const auto& status { match->second }; // Check status?
+              const std::string& managed_task_name {
+                job_id.name.has_value() ? *(job_id.name) : ""
+              };
+
+              if (managed_task_name == tgt_key) {
+                m_status_handler->m_rpc_queues[job_id].push(tgt_msg);
+
+                response.set_status_code(HTTP::CODE::OK);
+                response.set_content("Message queued.");
+                found = true;
+                break;
+              }
+            }
+
+            if (!found) {
+              response.set_status_code(HTTP::CODE::BadRequest);
+              response.set_content("Target not found for requested DAG!");
+            }
+          } else {
+            response.set_status_code(HTTP::CODE::BadRequest);
+            response.set_content("Must provide wf_id (or job_key)!");
           }
-
-          HTTP::Response response(HTTP::CODE::OK);
-          response.set_content("Message queued.");
-
-          return response;
         } catch (const JobNotRegistered& e) {
-          HTTP::Response response(HTTP::CODE::BadRequest);
-          response.set_content(e.what());
-
-          return response;
+          response.set_status_code(HTTP::CODE::BadRequest);
+          response.set_content("Requested target job was not registered!");
+        } catch (...) {
+          response.set_status_code(HTTP::CODE::BadRequest);
+          response.set_content("Unknown error!");
         }
+      } else {
+        response.set_status_code(HTTP::CODE::BadRequest);
+        response.set_content("Must provide target, message, and wf_id (or job_key)!");
       }
 
-      return HTTP::Response(HTTP::CODE::BadRequest);
+      return response;
     } else if (request.method() == HTTP::METHOD::GET) {
-      // Basic query param parsing for ?task=...
-      std::string task_name;
-      size_t pos = request.url().find("task=");
-      if (pos != std::string::npos) {
-        task_name = request.url().substr(pos + 5);
-        size_t amp_pos = task_name.find('&');
+      // For GET, we require the use of job_key directly
+
+      // Basic query param parsing for ?job_key
+      std::string job_key;
+      std::size_t job_key_pos { request.url().find("job_key=") };
+      if (job_key_pos != std::string::npos) {
+        job_key = request.url().substr(job_key_pos + 8);
+
+        // Check for ampersands
+        std::size_t amp_pos { job_key.find('&') };
         if (amp_pos != std::string::npos) {
-          task_name = task_name.substr(0, amp_pos);
+          job_key = job_key.substr(0, amp_pos);
         }
       } else {
         // Try body if not in query param
         std::map<std::string, std::string> rpc_data;
         parse_json(request.content(), rpc_data);
-        if (rpc_data.find("task") != rpc_data.end()) {
-          task_name = rpc_data["task"];
+
+        auto job_key_it { rpc_data.find("job_key") };
+        if (job_key_it != rpc_data.end()) {
+          job_key = job_key_it->second;
         }
 
-        // Check for JobID and update the most recent time stamp
-        if (rpc_data.count("orig_job_id")) {
-          const std::string& launch_id { rpc_data["orig_job_id"] };
-          auto ts { std::chrono::steady_clock::now() };
-          JobRegistry::set_last_update_time_by_launch(launch_id, ts);
+        // Set the last update time -- if possible (fails in tests)
+        try {
+          if (!job_key.empty()) {
+            auto job_id { JobRegistry::job_id_from_key(job_key) };
+            auto ts { std::chrono::steady_clock::now() };
+            JobRegistry::set_last_update_time(job_id, ts);
+          } else {
+            // Even if the job_key was mised, if they did include a unique launch ID we
+            // can update the time stored - the response still has BadRequest.
+
+            auto orig_launch_id_it { rpc_data.find("orig_job_id") };
+            if (orig_launch_id_it != rpc_data.end()) {
+              const std::string& launch_id { orig_launch_id_it->second };
+              auto ts { std::chrono::steady_clock::now() };
+              JobRegistry::set_last_update_time_by_launch(launch_id, ts);
+            }
+          }
+        } catch (const JobNotRegistered& e) {
+
         }
       }
 
-      if (!task_name.empty()) {
+      if (!job_key.empty()) {
         std::lock_guard<std::mutex> lock(m_status_handler->m_status_mut);
-        auto job_ids { JobRegistry::job_ids_from_name(task_name) };
-        if (!job_ids.empty()) {
-          std::string full_msg { "{" };
 
-          for (const auto& job_id : job_ids) {
-            auto queue_it { m_status_handler->m_rpc_queues.find(job_id) };
+        JobIdentifier working_job_id { job_key };
+        // Use the same mapping for both (i.e., dont go via registry)
+        auto matching_job_queues = JobIdentifier::find_matching(m_status_handler->m_rpc_queues,
+                                                                working_job_id,
+                                                                &JobIdentifier::compatible);
 
-            if (queue_it != m_status_handler->m_rpc_queues.end() &&
-                !queue_it->second.empty()) {
-              std::string msg { queue_it->second.front() };
-              queue_it->second.pop();
-              if (full_msg != "{") {
-                full_msg += ", ";
-              }
+        std::string full_msg { "{" };
+        for (auto job_queue_it : matching_job_queues) {
+          if (!job_queue_it->second.empty()) {
+            std::string msg { job_queue_it->second.front() };
+            job_queue_it->second.pop();
 
-              full_msg += std::string( " \"message_" + job_id.job_key +"\": \"" + msg + "\"");
+            if (full_msg != "{") {
+              full_msg += ", ";
             }
+
+            full_msg += " \"message\": \"" + msg + "\"";
           }
-
-          full_msg += "}";
-
-          HTTP::Response response(HTTP::CODE::OK);
-          response.set_header("Content-Type", "application/json");
-          response.set_content(full_msg);
-
-          return response;
         }
+
+        full_msg += "}";
+
+        HTTP::Response response(HTTP::CODE::OK);
+        response.set_header("Content-Type", "application/json");
+        response.set_content(full_msg);
+
+        return response;
       }
 
       HTTP::Response response(HTTP::CODE::OK);
